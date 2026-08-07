@@ -65,69 +65,107 @@ export default function CanvasRenderer({
     await new Promise((resolve) => (userImg.onload = resolve));
 
     if (format === "A") {
-      // Format A: PFP Frame (Brutalist style)
+      // Format A: Radial PFP Frame for Social Media
+      const cx = width / 2;
+      const cy = height / 2;
+      const outerRadius = width / 2 - 10;
+      const innerRadius = width / 2 - 160; // Ring thickness of 150
       
-      // Background (optional, usually PFP frames are transparent, but here we want a square export)
-      ctx.fillStyle = colorBg;
-      ctx.fillRect(0, 0, width, height);
-
-      // We'll draw a brutalist circle or rounded square
-      const margin = 100;
-      const size = width - margin * 2;
-      const x = margin;
-      const y = margin;
-      
-      // Shadow layer
-      ctx.fillStyle = colorNeon;
-      ctx.beginPath();
-      ctx.arc(width/2 + 25, height/2 + 25, size/2, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // Image Base
+      // Master circular clip (so outer corners are fully transparent)
       ctx.save();
       ctx.beginPath();
-      ctx.arc(width/2, height/2, size/2, 0, Math.PI * 2);
+      ctx.arc(cx, cy, width/2, 0, Math.PI * 2);
       ctx.clip();
-      ctx.drawImage(userImg, x, y, size, size);
+
+      // Clear with transparent
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw User Photo in the center (clipped to innerRadius)
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(userImg, cx - innerRadius, cy - innerRadius, innerRadius * 2, innerRadius * 2);
       ctx.restore();
 
-      // Thick Border for Image
+      // 2. Draw the alternating Green/Yellow Ring with EXACTLY 1 letter per box
+      const textArray = "HACKER HOUSE GOA '26".split(""); // 20 characters including spaces
+      const numSegments = 30; // Updated to 30 segments as requested
+      const anglePerSegment = (Math.PI * 2) / numSegments;
+      
+      // Center the 20 characters symmetrically around the top (-Math.PI / 2)
+      // Half of the 20 segments is 10 segments. We move back 10 segments from the top center.
+      const startAngle = -Math.PI / 2 - (10 * anglePerSegment); 
+      
+      const textArcRadius = (outerRadius + innerRadius) / 2;
+      
+      // Use Imbue font, which is the official HH Goa font
+      // Scaled up back to 90px since 30 segments provides much wider boxes
+      ctx.font = "900 90px 'Imbue', serif"; 
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      for (let i = 0; i < numSegments; i++) {
+        const thetaStart = startAngle + i * anglePerSegment;
+        const thetaEnd = startAngle + (i + 1) * anglePerSegment;
+        
+        // Determine box color
+        const isGreenBox = i % 2 === 0;
+        
+        // Draw the colored block
+        ctx.fillStyle = isGreenBox ? colorPrimary : colorNeon;
+        ctx.beginPath();
+        ctx.arc(cx, cy, outerRadius, thetaStart, thetaEnd);
+        ctx.arc(cx, cy, innerRadius, thetaEnd, thetaStart, true);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Brutalist block border
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = colorBlack;
+        ctx.stroke();
+        
+        // Draw the character if there is one for this block
+        if (i < textArray.length) {
+          const char = textArray[i];
+          const thetaCenter = startAngle + (i + 0.5) * anglePerSegment;
+          
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(thetaCenter);
+          ctx.translate(textArcRadius, 0);
+          ctx.rotate(Math.PI / 2);
+          
+          // Invert colors: Yellow text on Green box, Green text on Yellow box
+          ctx.fillStyle = isGreenBox ? colorNeon : colorPrimary;
+          
+          // Subtle black stroke for better contrast against the box
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = colorBlack;
+          ctx.strokeText(char, 0, 0);
+          
+          // Fill text with the inverted color
+          ctx.fillText(char, 0, 0);
+          ctx.restore();
+        }
+      }
+
+      // 5. Draw the thick black inner and outer borders
+      // Outer border
       ctx.beginPath();
-      ctx.arc(width/2, height/2, size/2, 0, Math.PI * 2);
+      ctx.arc(cx, cy, outerRadius, 0, Math.PI * 2);
       ctx.lineWidth = 20;
       ctx.strokeStyle = colorBlack;
       ctx.stroke();
 
-      // Floating Badge
-      const badgeW = 600;
-      const badgeH = 150;
-      const badgeX = (width - badgeW) / 2;
-      const badgeY = height - margin - 80;
-
-      // Badge Shadow
-      ctx.fillStyle = colorBlack;
-      ctx.fillRect(badgeX + 15, badgeY + 15, badgeW, badgeH);
-
-      // Badge Body
-      ctx.fillStyle = colorPink;
-      ctx.fillRect(badgeX, badgeY, badgeW, badgeH);
-      
-      // Badge Border
-      ctx.lineWidth = 10;
+      // Inner border
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
+      ctx.lineWidth = 20;
       ctx.strokeStyle = colorBlack;
-      ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
+      ctx.stroke();
 
-      // Badge Text
-      ctx.fillStyle = colorWhiteText();
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.font = "800 90px 'Imbue', serif";
-      ctx.fillText("HH GOA '26", width/2, badgeY + badgeH/2 + 10);
-      
-      function colorWhiteText() {
-        return "#ffffff";
-      }
-      
+      ctx.restore(); // Restore master clip
     } else {
       // Format B - Builder ID Card (Neo-Brutalist)
       
@@ -237,8 +275,8 @@ export default function CanvasRenderer({
       }
     }
 
-    // Export Data URL
-    const finalDataUrl = canvas.toDataURL("image/jpeg", 1.0);
+    // Export Data URL as PNG to support transparency (critical for circular PFPs)
+    const finalDataUrl = canvas.toDataURL("image/png");
     onRenderComplete(finalDataUrl);
     setIsRendering(false);
   };
