@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Imbue, Victor_Mono } from "next/font/google";
 import "./globals.css";
+import DynamicBackground from "@/components/DynamicBackground";
 
 const imbue = Imbue({
   variable: "--font-imbue",
@@ -34,7 +35,8 @@ export default function RootLayout({
       lang="en"
       className={`${imbue.variable} ${victorMono.variable} antialiased h-full`}
     >
-      <body className="min-h-full flex flex-col bg-brand-bg text-black font-mono selection:bg-brand-neon selection:text-black">
+      <body className="min-h-full flex flex-col text-black font-mono selection:bg-brand-neon selection:text-black">
+        <DynamicBackground />
         {children}
       </body>
     </html>

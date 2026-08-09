@@ -59,6 +59,7 @@ export default function CanvasRenderer({
     const colorBlack = "#000000";
 
     // Load User Image
+    if (!imageSrc) return;
     const userImg = new Image();
     userImg.crossOrigin = "anonymous";
     userImg.src = imageSrc;

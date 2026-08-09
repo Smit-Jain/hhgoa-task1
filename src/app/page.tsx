@@ -6,6 +6,38 @@ import CanvasRenderer, { FormatType } from "@/components/CanvasRenderer";
 import ShareButtons from "@/components/ShareButtons";
 import { Zap, Image as ImageIcon, CreditCard } from "lucide-react";
 
+let audioCtx: AudioContext | null = null;
+
+const playClickSound = () => {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    // A crisp, tiny "t" tick sound (like a modern UI pop)
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.02);
+    
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.02);
+  } catch (e) {
+    console.error("Audio error:", e);
+  }
+};
+
 const BUILDER_TITLES = [
   "10X ENGINEER",
   "SHITPOSTER",
@@ -29,6 +61,17 @@ export default function Home() {
 
   useEffect(() => {
     setTitle(BUILDER_TITLES[Math.floor(Math.random() * BUILDER_TITLES.length)]);
+
+    // Global click listener for button sounds
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('button')) {
+        playClickSound();
+      }
+    };
+    
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
   }, []);
 
   const handleReset = () => {
@@ -45,7 +88,7 @@ export default function Home() {
           <Zap className="w-4 h-4" />
           <span>Shortlisting Task</span>
         </div>
-        <h1 className="text-6xl md:text-8xl font-display font-black tracking-tight mb-4 text-brand-primary text-shadow-neon uppercase">
+        <h1 className="text-6xl md:text-8xl font-display font-black tracking-tight mb-4 text-white text-shadow-black uppercase" style={{ textShadow: "4px 4px 0px #000" }}>
           HH GOA 2026
         </h1>
         <p className="text-black font-bold max-w-xl mx-auto text-lg uppercase bg-brand-pink text-white brutalist-border px-4 py-2 brutalist-shadow">
