@@ -3,7 +3,7 @@
 @theme {
   --font-display: var(--font-imbue);
   --font-mono: var(--font-victor-mono);
-  
+
   --color-brand-bg: #fffbe8;
   --color-brand-primary: #0b6839;
   --color-brand-neon: #fee101;
@@ -14,15 +14,15 @@
   .brutalist-shadow {
     box-shadow: 6px 6px 0px 0px #000000;
   }
-  
+
   .brutalist-shadow-neon {
     box-shadow: 6px 6px 0px 0px var(--color-brand-neon);
   }
-  
+
   .brutalist-border {
     border: 3px solid #000000;
   }
-  
+
   .text-shadow-solid {
     text-shadow: 3px 3px 0px #000000;
   }
@@ -32,7 +32,11 @@
   }
 }
 
-html,
+html {
+  font-size: 90%;
+  height: 100%;
+}
+
 body {
   height: 100%;
 }
@@ -41,14 +45,37 @@ body {
 ::-webkit-scrollbar {
   width: 12px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--color-brand-bg);
   border-left: 2px solid #000;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--color-brand-neon);
   border: 2px solid #000;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-brand-primary);
+}
+
+@keyframes slam-drop {
+  0% { transform: translateY(-100vh) scale(2); opacity: 0; }
+  60% { transform: translateY(20px) scale(0.9); opacity: 1; }
+  80% { transform: translateY(-10px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-slam {
+  animation: slam-drop 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-float-delayed {
+  animation: float 4s ease-in-out 0.8s infinite;
 }

@@ -7,6 +7,7 @@ import CanvasRenderer, { FormatType } from "@/components/CanvasRenderer";
 import ShareButtons from "@/components/ShareButtons";
 import { Zap, Image as ImageIcon, CreditCard } from "lucide-react";
 import logoImg from "../../public/247pm-studio.png";
+import sunLogoImg from "../../public/sun-logo.png";
 
 let audioCtx: AudioContext | null = null;
 
@@ -102,18 +103,45 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center space-x-2 bg-brand-neon text-black brutalist-border px-4 py-1.5 font-bold mb-6 brutalist-shadow uppercase tracking-widest text-sm">
-            <Zap className="w-4 h-4" />
-            <span>Shortlisting Task</span>
+        <div className="text-center flex flex-col items-center relative z-20 translate-y-[52px] md:translate-y-[68px]">
+          
+          <div className="relative inline-flex flex-col items-center leading-none mt-8 md:mt-12 mb-2 translate-y-[10px]">
+             <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-display font-semibold tracking-tight text-[#fee101] uppercase scale-x-150 inline-block" style={{ textShadow: "4px 4px 0px #0b6839" }}>
+               HACKER
+             </h1>
+             
+             {/* The image overlapping between HACKER and HOUSE */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-[5px] z-30 w-14 md:w-24 pointer-events-none">
+                <div className="animate-slam drop-shadow-lg" style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }}>
+                   <div className="animate-float-delayed pointer-events-auto transition-all duration-300 hover:scale-125 hover:-rotate-3 cursor-pointer">
+                      <Image src={sunLogoImg} alt="Sun Logo" className="w-full h-auto object-contain" />
+                   </div>
+                </div>
+             </div>
+
+             <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-display font-semibold tracking-tight text-[#0b6839] uppercase scale-x-150 inline-block" style={{ textShadow: "4px 4px 0px #fee101" }}>
+               HOUSE
+             </h1>
           </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-black tracking-tight mb-4 text-[#0b6839] uppercase" style={{ textShadow: "4px 4px 0px #fee101" }}>
-            HACKER HOUSE GOA 2026
-          </h1>
-
-          <p className="text-black font-bold max-w-xl mx-auto text-lg uppercase bg-brand-pink text-white brutalist-border px-4 py-2 brutalist-shadow">
+          <p className="mt-2 text-black font-bold max-w-xl mx-auto text-base md:text-lg uppercase bg-brand-pink text-white brutalist-border px-4 py-2 brutalist-shadow relative z-20">
             Generate your personalized Hacker House frame or builder ID card.
+          </p>
+
+          <div className="mt-5 inline-flex items-center justify-center space-x-2 bg-brand-neon text-black brutalist-border px-4 py-1.5 font-bold brutalist-shadow uppercase tracking-widest text-sm relative z-20 mb-8">
+            <Zap className="w-4 h-4" />
+            <span>Shortlist Task</span>
+          </div>
+          
+        </div>
+
+        {/* Date and Location (Bottom Right) */}
+        <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 z-20 pointer-events-none text-right">
+          <p className="font-mono text-[#0b6839] font-bold text-sm md:text-base tracking-[0.2em] uppercase leading-tight mb-1">
+            GOA, INDIA
+          </p>
+          <p className="font-mono text-[#0b6839] font-bold text-sm md:text-base tracking-[0.2em] uppercase leading-tight">
+            28 - 31 OCT 2026
           </p>
         </div>
       </section>
@@ -123,7 +151,7 @@ export default function Home() {
 
         {/* Format Selector */}
         <div className="w-full max-w-2xl mb-12">
-          <div className="space-y-3 bg-white p-6 brutalist-border brutalist-shadow">
+          <div className="space-y-3 bg-brand-bg p-6 brutalist-border brutalist-shadow">
             <label className="text-lg font-black text-black uppercase tracking-wider block mb-4 border-b-4 border-black pb-2">
               1. Choose Format
             </label>
@@ -175,7 +203,7 @@ export default function Home() {
                       maxLength={20}
                       value={name}
                       onChange={(e) => setName(e.target.value.toUpperCase())}
-                      className="w-full bg-white brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none focus:bg-brand-bg"
+                      className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none"
                     />
                   </div>
 
@@ -186,7 +214,7 @@ export default function Home() {
                       maxLength={30}
                       value={stack}
                       onChange={(e) => setStack(e.target.value.toUpperCase())}
-                      className="w-full bg-white brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none focus:bg-brand-bg"
+                      className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none"
                     />
                   </div>
                 </div>
@@ -212,7 +240,7 @@ export default function Home() {
               {!croppedImage ? (
                 <ImageUploader onImageCropped={setCroppedImage} />
               ) : (
-                <div className="p-4 bg-white text-black brutalist-border flex items-center justify-between">
+                <div className="p-4 bg-brand-bg text-black brutalist-border flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <img src={croppedImage} alt="Cropped" className="w-16 h-16 object-cover brutalist-border" />
                     <span className="text-lg font-black flex items-center">
