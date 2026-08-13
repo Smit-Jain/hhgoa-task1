@@ -9,6 +9,8 @@ interface CanvasRendererProps {
   imageSrc: string | null;
   name: string;
   stack: string;
+  github: string;
+  twitter: string;
   title: string;
   onRenderComplete: (dataUrl: string) => void;
 }
@@ -18,6 +20,8 @@ export default function CanvasRenderer({
   imageSrc,
   name,
   stack,
+  github,
+  twitter,
   title,
   onRenderComplete
 }: CanvasRendererProps) {
@@ -31,7 +35,7 @@ export default function CanvasRenderer({
       if (!imageSrc || !canvasRef.current) return;
       renderCanvas();
     });
-  }, [format, imageSrc, name, stack, title]);
+  }, [format, imageSrc, name, stack, github, twitter, title]);
 
   const renderCanvas = async () => {
     setIsRendering(true);
@@ -242,6 +246,22 @@ export default function CanvasRenderer({
       ctx.fillStyle = colorBg;
       ctx.font = "700 50px 'Victor Mono', monospace";
       ctx.fillText(displayStack, margin + 60, photoY + photoSize + 200);
+
+      // Social Handles (GitHub & Twitter)
+      ctx.fillStyle = colorNeon;
+      ctx.font = "700 35px 'Victor Mono', monospace";
+      ctx.shadowColor = colorBlack;
+      ctx.shadowOffsetX = 4;
+      ctx.shadowOffsetY = 4;
+      if (github.trim()) {
+        ctx.fillText(`GH: ${github.toUpperCase()}`, decoX, photoY + 220);
+      }
+      if (twitter.trim()) {
+        ctx.fillText(`X: ${twitter.toUpperCase()}`, decoX, photoY + 280);
+      }
+      // Reset Shadow for next text
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
 
       // Generated Title Tag
       const titleTag = title || "10X ENGINEER";
