@@ -103,36 +103,49 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="text-center flex flex-col items-center relative z-20 translate-y-[52px] md:translate-y-[68px]">
+        {/* Text split into two sections matching the canvas 56%/44% boundary */}
+        <div className="absolute inset-0 z-20 flex flex-col pointer-events-none" style={{ height: '100vh' }}>
           
-          <div className="relative inline-flex flex-col items-center leading-none mt-8 md:mt-12 mb-2 translate-y-[10px]">
-             <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-display font-semibold tracking-tight text-[#fee101] uppercase scale-x-150 inline-block" style={{ textShadow: "4px 4px 0px #0b6839" }}>
-               HACKER
-             </h1>
-             
-             {/* The image overlapping between HACKER and HOUSE */}
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-[5px] z-30 w-14 md:w-24 pointer-events-none">
-                <div className="animate-slam drop-shadow-lg" style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }}>
-                   <div className="animate-float-delayed pointer-events-auto transition-all duration-300 hover:scale-125 hover:-rotate-3 cursor-pointer">
-                      <Image src={sunLogoImg} alt="Sun Logo" className="w-full h-auto object-contain" />
-                   </div>
-                </div>
-             </div>
-
-             <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-display font-semibold tracking-tight text-[#0b6839] uppercase scale-x-150 inline-block" style={{ textShadow: "4px 4px 0px #fee101" }}>
-               HOUSE
-             </h1>
+          {/* Sea section (top 56%) — HACKER sits at the bottom */}
+          <div className="flex items-end justify-center" style={{ height: '56%' }}>
+            <h1 
+              className="font-display font-semibold tracking-tight text-[#fee101] uppercase scale-x-150 inline-block pointer-events-auto"
+              style={{ fontSize: 'clamp(5rem, 21vh, 15rem)', lineHeight: 1, textShadow: '4px 4px 0px #0b6839' }}
+            >
+              HACKER
+            </h1>
           </div>
 
-          <p className="mt-2 text-black font-bold max-w-xl mx-auto text-base md:text-lg uppercase bg-brand-pink text-white brutalist-border px-4 py-2 brutalist-shadow relative z-20">
-            Generate your personalized Hacker House frame or builder ID card.
-          </p>
+          {/* Sand section (bottom 44%) — HOUSE, boxes sit at the top */}
+          <div className="flex flex-col items-center" style={{ height: '44%' }}>
+            
+            {/* HOUSE text */}
+            <h1 
+              className="font-display font-semibold tracking-tight text-[#0b6839] uppercase scale-x-150 inline-block pointer-events-auto"
+              style={{ fontSize: 'clamp(5rem, 21vh, 15rem)', lineHeight: 1, textShadow: '4px 4px 0px #fee101' }}
+            >
+              HOUSE
+            </h1>
 
-          <div className="mt-5 inline-flex items-center justify-center space-x-2 bg-brand-neon text-black brutalist-border px-4 py-1.5 font-bold brutalist-shadow uppercase tracking-widest text-sm relative z-20 mb-8">
-            <Zap className="w-4 h-4" />
-            <span>Shortlist Task</span>
+            <p className="mt-3 text-center text-black font-bold max-w-xl mx-auto text-base md:text-lg uppercase bg-brand-pink text-white brutalist-border px-4 py-2 brutalist-shadow pointer-events-auto">
+              Generate your personalized Hacker House frame or builder ID card.
+            </p>
+
+            <div className="mt-5 inline-flex items-center justify-center space-x-2 bg-brand-neon text-black brutalist-border px-4 py-1.5 font-bold brutalist-shadow uppercase tracking-widest text-sm pointer-events-auto">
+              <Zap className="w-4 h-4" />
+              <span>Shortlist Task</span>
+            </div>
           </div>
-          
+
+          {/* Goa logo floating at the boundary */}
+          <div className="absolute left-1/2 z-30 w-14 md:w-24" style={{ top: '56%', transform: 'translate(-50%, -50%)' }}>
+            <div className="animate-slam drop-shadow-lg" style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }}>
+              <div className="animate-float-delayed pointer-events-auto transition-all duration-300 hover:scale-125 hover:-rotate-3 cursor-pointer">
+                <Image src={sunLogoImg} alt="Sun Logo" className="w-full h-auto object-contain" />
+              </div>
+            </div>
+          </div>
+
         </div>
 
         {/* Date and Location (Bottom Right) */}
