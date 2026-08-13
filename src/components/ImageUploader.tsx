@@ -7,9 +7,10 @@ import getCroppedImg from "@/utils/cropImage";
 
 interface ImageUploaderProps {
   onImageCropped: (croppedImageUrl: string) => void;
+  aspectRatio?: number;
 }
 
-export default function ImageUploader({ onImageCropped }: ImageUploaderProps) {
+export default function ImageUploader({ onImageCropped, aspectRatio = 1 }: ImageUploaderProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -110,7 +111,7 @@ export default function ImageUploader({ onImageCropped }: ImageUploaderProps) {
               image={imageSrc}
               crop={crop}
               zoom={zoom}
-              aspect={1}
+              aspect={aspectRatio}
               onCropChange={setCrop}
               onCropComplete={onCropComplete}
               onZoomChange={setZoom}

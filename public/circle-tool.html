@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div style="position: absolute; top: 10px; left: 10px; background: white; padding: 10px; z-index: 100;" id="log">Click 3 points on the edge of the INNER circle, then 3 points on the edge of the OUTER circle.</div>
+  <img src="pfp-frame.png" id="img" style="cursor: crosshair; transform-origin: top left; transform: scale(1);"/>
+  <script>
+    const img = document.getElementById('img');
+    const log = document.getElementById('log');
+    let points = [];
+    
+    function calculateCircle(p1, p2, p3) {
+      const x12 = p1.x - p2.x;
+      const x13 = p1.x - p3.x;
+      const y12 = p1.y - p2.y;
+      const y13 = p1.y - p3.y;
+      const y31 = p3.y - p1.y;
+      const y21 = p2.y - p1.y;
+      const x31 = p3.x - p1.x;
+      const x21 = p2.x - p1.x;
+
+      const sx13 = Math.pow(p1.x, 2) - Math.pow(p3.x, 2);
+      const sy13 = Math.pow(p1.y, 2) - Math.pow(p3.y, 2);
+      const sx21 = Math.pow(p2.x, 2) - Math.pow(p1.x, 2);
+      const sy21 = Math.pow(p2.y, 2) - Math.pow(p1.y, 2);
+
+      const f = ((sx13) * (x12) + (sy13) * (x12) + (sx21) * (x13) + (sy21) * (x13)) / (2 * ((y31) * (x12) - (y21) * (x13)));
+      const g = ((sx13) * (y12) + (sy13) * (y12) + (sx21) * (y13) + (sy21) * (y13)) / (2 * ((x31) * (y12) - (x21) * (y13)));
+      
+      const c = -Math.pow(p1.x, 2) - Math.pow(p1.y, 2) - 2 * g * p1.x - 2 * f * p1.y;
+      const h = -g;
+      const k = -f;
+      const sqr_of_r = h * h + k * k - c;
+      const r = Math.sqrt(sqr_of_r);
+
+      return { cx: Math.round(h), cy: Math.round(k), r: Math.round(r) };
+    }
+
+    img.addEventListener('click', (e) => {
+      const rect = img.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width * img.naturalWidth;
+      const y = (e.clientY - rect.top) / rect.height * img.naturalHeight;
+      points.push({x, y});
+      log.innerHTML += `<br>Point ${points.length}: ${Math.round(x)}, ${Math.round(y)}`;
+      
+      if (points.length === 3) {
+        const inner = calculateCircle(points[0], points[1], points[2]);
+        log.innerHTML += `<br><strong>INNER CIRCLE: cx=${inner.cx}, cy=${inner.cy}, r=${inner.r}</strong>`;
+      }
+      
+      if (points.length === 6) {
+        const outer = calculateCircle(points[3], points[4], points[5]);
+        log.innerHTML += `<br><strong>OUTER CIRCLE: cx=${outer.cx}, cy=${outer.cy}, r=${outer.r}</strong>`;
+        console.log(`INNER: cx=${calculateCircle(points[0], points[1], points[2]).cx}, cy=${calculateCircle(points[0], points[1], points[2]).cy}, r=${calculateCircle(points[0], points[1], points[2]).r}`);
+        console.log(`OUTER: cx=${outer.cx}, cy=${outer.cy}, r=${outer.r}`);
+      }
+    });
+  </script>
+</body>
+</html>

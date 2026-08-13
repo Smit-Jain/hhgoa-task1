@@ -7,10 +7,10 @@ interface BuilderFormProps {
   setName: (v: string) => void;
   stack: string;
   setStack: (v: string) => void;
-  github: string;
-  setGithub: (v: string) => void;
-  twitter: string;
-  setTwitter: (v: string) => void;
+  title: string;
+  setTitle: (v: string) => void;
+  iBuild: string;
+  setIBuild: (v: string) => void;
 }
 
 export default function BuilderForm({
@@ -19,10 +19,10 @@ export default function BuilderForm({
   setName,
   stack,
   setStack,
-  github,
-  setGithub,
-  twitter,
-  setTwitter
+  title,
+  setTitle,
+  iBuild,
+  setIBuild
 }: BuilderFormProps) {
   if (format !== "B") return null;
 
@@ -39,7 +39,7 @@ export default function BuilderForm({
             placeholder="NAME (E.G. JOHN DOE)"
             maxLength={20}
             value={name}
-            onChange={(e) => setName(e.target.value.toUpperCase())}
+            onChange={(e) => setName(e.target.value)}
             required
             className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none mb-4"
           />
@@ -51,27 +51,32 @@ export default function BuilderForm({
             placeholder="ROLE (E.G. FULL STACK HACKER)"
             maxLength={30}
             value={stack}
-            onChange={(e) => setStack(e.target.value.toUpperCase())}
+            onChange={(e) => setStack(e.target.value)}
             required
             className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none mb-4"
           />
         </fieldset>
 
-        <fieldset className="grid grid-cols-2 gap-4">
+        <fieldset>
           <input
             type="text"
-            placeholder="GITHUB HANDLE"
-            maxLength={20}
-            value={github}
-            onChange={(e) => setGithub(e.target.value)}
-            className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none"
+            placeholder="BUILDER TITLE (E.G. DEGEN BUILDER)"
+            maxLength={25}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none mb-4"
           />
+        </fieldset>
+
+        <fieldset>
           <input
             type="text"
-            placeholder="X/TWITTER HANDLE"
-            maxLength={20}
-            value={twitter}
-            onChange={(e) => setTwitter(e.target.value)}
+            placeholder="I BUILD... (E.G. Apps that make an impact)"
+            maxLength={40}
+            value={iBuild}
+            onChange={(e) => setIBuild(e.target.value)}
+            required
             className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none"
           />
         </fieldset>

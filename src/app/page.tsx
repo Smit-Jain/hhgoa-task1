@@ -5,12 +5,11 @@ import Image from "next/image";
 import ImageUploader from "@/components/ImageUploader";
 import CanvasRenderer, { FormatType } from "@/components/CanvasRenderer";
 import BuilderForm from "@/components/BuilderForm";
-import TeamForm from "@/components/TeamForm";
-import { TeamMember } from "@/components/CanvasRenderer";
 import ShareButtons from "@/components/ShareButtons";
-import { Zap, Image as ImageIcon, CreditCard, Users } from "lucide-react";
+import { Zap, Image as ImageIcon, CreditCard, Download, Share2, RefreshCcw } from "lucide-react";
 import logoImg from "../../public/247pm-studio.png";
 import sunLogoImg from "../../public/sun-logo.png";
+import PaperAnimation from "@/components/PaperAnimation";
 
 let audioCtx: AudioContext | null = null;
 
@@ -63,13 +62,9 @@ export default function Home() {
   // Format B State
   const [name, setName] = useState("");
   const [stack, setStack] = useState("");
-  const [github, setGithub] = useState("");
-  const [twitter, setTwitter] = useState("");
   const [title, setTitle] = useState("");
-
-  // Format C (Team ID) State
-  const [teamName, setTeamName] = useState("");
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [iBuild, setIBuild] = useState("");
+  const [appState, setAppState] = useState<"editing" | "animating" | "done">("editing");
 
   useEffect(() => {
     setTitle(BUILDER_TITLES[Math.floor(Math.random() * BUILDER_TITLES.length)]);
@@ -89,6 +84,7 @@ export default function Home() {
   const handleReset = () => {
     setCroppedImage(null);
     setFinalImage(null);
+    setAppState("editing");
   };
 
   return (
@@ -171,142 +167,171 @@ export default function Home() {
       {/* MAIN CONTENT — Below the fold, on the sand/cream area */}
       <main id="generator" className="max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col items-center">
 
-        {/* Format Selector */}
-        <div className="w-full max-w-2xl mb-12">
-          <div className="space-y-3 bg-brand-bg p-6 brutalist-border brutalist-shadow">
-            <label className="text-lg font-black text-black uppercase tracking-wider block mb-4 border-b-4 border-black pb-2">
-              1. Choose Format
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button
-                onClick={() => setFormat("A")}
-                className={`p-4 brutalist-border flex flex-col items-center text-center transition-transform active:translate-y-1 active:translate-x-1 ${format === "A"
-                  ? "bg-brand-primary text-white brutalist-shadow-neon"
-                  : "bg-brand-bg text-black hover:bg-brand-neon"
-                  }`}
-                style={{ boxShadow: format === "A" ? '6px 6px 0px 0px #fee101' : '4px 4px 0px 0px #000' }}
-              >
-                <ImageIcon className="w-8 h-8 mb-2" />
-                <span className="font-bold">PFP Frame</span>
-              </button>
-
-              <button
-                onClick={() => setFormat("B")}
-                className={`p-4 brutalist-border flex flex-col items-center text-center transition-transform active:translate-y-1 active:translate-x-1 ${format === "B"
-                  ? "bg-brand-primary text-white brutalist-shadow-neon"
-                  : "bg-brand-bg text-black hover:bg-brand-neon"
-                  }`}
-                style={{ boxShadow: format === "B" ? '6px 6px 0px 0px #fee101' : '4px 4px 0px 0px #000' }}
-              >
-                <CreditCard className="w-8 h-8 mb-2" />
-                <span className="font-bold">Builder ID</span>
-              </button>
-              <button
-                onClick={() => setFormat("C")}
-                className={`p-4 brutalist-border flex flex-col items-center text-center transition-transform active:translate-y-1 active:translate-x-1 ${format === "C"
-                  ? "bg-brand-primary text-white brutalist-shadow-neon"
-                  : "bg-brand-bg text-black hover:bg-brand-neon"
-                  }`}
-                style={{ boxShadow: format === "C" ? '6px 6px 0px 0px #fee101' : '4px 4px 0px 0px #000' }}
-              >
-                <Users className="w-8 h-8 mb-2" />
-                <span className="font-bold">Team ID</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-
-          {/* Left Column: Inputs */}
-          <div className="lg:col-span-5 space-y-8 w-full max-w-md mx-auto lg:mx-0">
-
-            <BuilderForm
+        {/* Off-screen canvas to continuously generate the final image */}
+        {croppedImage && (
+          <div style={{ position: 'fixed', top: '-9999px', left: '-9999px', visibility: 'hidden', pointerEvents: 'none' }}>
+            <CanvasRenderer
               format={format}
+              imageSrc={croppedImage}
               name={name}
-              setName={setName}
               stack={stack}
-              setStack={setStack}
-              github={github}
-              setGithub={setGithub}
-              twitter={twitter}
-              setTwitter={setTwitter}
+              title={title}
+              iBuild={iBuild}
+              onRenderComplete={setFinalImage}
             />
+          </div>
+        )}
 
-            <TeamForm
-              format={format}
-              teamName={teamName}
-              setTeamName={setTeamName}
-              teamMembers={teamMembers}
-              setTeamMembers={setTeamMembers}
-            />
-
-            {/* Upload Section */}
-            <div className="bg-brand-pink p-6 brutalist-border brutalist-shadow text-white">
-              <div className="flex items-center justify-between mb-4 border-b-4 border-black pb-2">
-                <label className="text-lg font-black uppercase tracking-wider block text-black">
-                  {format === "B" ? "3. Upload Photo" : format === "C" ? "3. Upload Team Photo" : "2. Upload Photo"}
+        {appState === "editing" && (
+          <div className="w-full flex flex-col items-center animate-in fade-in zoom-in duration-300">
+            {/* Format Selector */}
+            <div className="w-full max-w-2xl mb-12">
+              <div className="space-y-3 bg-brand-bg p-6 brutalist-border brutalist-shadow">
+                <label className="text-lg font-black text-black uppercase tracking-wider block mb-4 border-b-4 border-black pb-2">
+                  1. Choose Format
                 </label>
-                {croppedImage && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button
-                    onClick={handleReset}
-                    className="text-xs bg-black text-brand-neon px-2 py-1 brutalist-border font-bold hover:bg-brand-primary"
+                    onClick={() => setFormat("A")}
+                    className={`p-4 brutalist-border flex flex-col items-center text-center transition-transform active:translate-y-1 active:translate-x-1 ${format === "A"
+                      ? "bg-brand-primary text-white brutalist-shadow-neon"
+                      : "bg-brand-bg text-black hover:bg-brand-neon"
+                      }`}
+                    style={{ boxShadow: format === "A" ? '6px 6px 0px 0px #fee101' : '4px 4px 0px 0px #000' }}
                   >
-                    CHANGE PHOTO
+                    <ImageIcon className="w-8 h-8 mb-2" />
+                    <span className="font-bold">PFP Frame</span>
                   </button>
+
+                  <button
+                    onClick={() => setFormat("B")}
+                    className={`p-4 brutalist-border flex flex-col items-center text-center transition-transform active:translate-y-1 active:translate-x-1 ${format === "B"
+                      ? "bg-brand-primary text-white brutalist-shadow-neon"
+                      : "bg-brand-bg text-black hover:bg-brand-neon"
+                      }`}
+                    style={{ boxShadow: format === "B" ? '6px 6px 0px 0px #fee101' : '4px 4px 0px 0px #000' }}
+                  >
+                    <CreditCard className="w-8 h-8 mb-2" />
+                    <span className="font-bold">Builder ID</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Inputs & Generate */}
+            <div className="w-full max-w-2xl space-y-8">
+              <BuilderForm
+                format={format}
+                name={name}
+                setName={setName}
+                stack={stack}
+                setStack={setStack}
+                title={title}
+                setTitle={setTitle}
+                iBuild={iBuild}
+                setIBuild={setIBuild}
+              />
+
+              <div className="bg-brand-pink p-6 brutalist-border brutalist-shadow text-white">
+                <div className="flex items-center justify-between mb-4 border-b-4 border-black pb-2">
+                  <label className="text-lg font-black uppercase tracking-wider block text-black">
+                    {format === "B" ? "3. Upload Photo" : "2. Upload Photo"}
+                  </label>
+                  {croppedImage && (
+                    <button
+                      onClick={() => setCroppedImage(null)}
+                      className="text-xs bg-black text-brand-neon px-2 py-1 brutalist-border font-bold hover:bg-brand-primary"
+                    >
+                      CHANGE PHOTO
+                    </button>
+                  )}
+                </div>
+
+                {!croppedImage ? (
+                  <ImageUploader 
+                    onImageCropped={setCroppedImage} 
+                    aspectRatio={format === "A" ? 1 : format === "B" ? 313/376 : 16/9} 
+                  />
+                ) : (
+                  <div className="p-4 bg-brand-bg text-black brutalist-border flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <img src={croppedImage} alt="Cropped" className="w-16 h-16 object-cover brutalist-border" />
+                      <span className="text-lg font-black flex items-center">
+                        <Zap className="w-5 h-5 mr-2 text-brand-pink fill-current" /> READY!
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              {!croppedImage ? (
-                <ImageUploader onImageCropped={setCroppedImage} />
-              ) : (
-                <div className="p-4 bg-brand-bg text-black brutalist-border flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img src={croppedImage} alt="Cropped" className="w-16 h-16 object-cover brutalist-border" />
-                    <span className="text-lg font-black flex items-center">
-                      <Zap className="w-5 h-5 mr-2 text-brand-pink fill-current" /> READY!
-                    </span>
-                  </div>
-                </div>
+              {/* Generate Button */}
+              {croppedImage && (
+                <button
+                  onClick={() => {
+                    document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    setAppState("animating");
+                  }}
+                  className="w-full mt-8 bg-brand-neon text-black p-4 brutalist-border text-xl font-black uppercase tracking-widest hover:bg-brand-primary hover:text-white transition-all brutalist-shadow active:translate-y-1 active:translate-x-1"
+                  style={{ boxShadow: '4px 4px 0px 0px #000' }}
+                >
+                  Create Image
+                </button>
               )}
             </div>
           </div>
+        )}
 
-          {/* Right Column: Preview & Output */}
-          <div className="lg:col-span-7 w-full flex flex-col items-center">
-            <div className="bg-white p-6 brutalist-border brutalist-shadow w-full">
-              <label className="text-lg font-black text-black uppercase tracking-wider block mb-6 border-b-4 border-black pb-2 text-center lg:text-left">
-                Live Preview
+        {appState === "animating" && finalImage && (
+          <div className="w-full max-w-4xl animate-in fade-in zoom-in duration-500">
+            <PaperAnimation 
+              textureUrl={finalImage} 
+              aspectRatio={format === "A" ? 1 : 1536/1024}
+              onAnimationComplete={() => setAppState("done")} 
+            />
+          </div>
+        )}
+
+        {appState === "done" && finalImage && (
+          <div className="w-full max-w-2xl flex flex-col items-center animate-in slide-in-from-bottom-8 fade-in duration-700">
+            <div className="w-full bg-white p-6 brutalist-border brutalist-shadow">
+              <label className="text-lg font-black text-black uppercase tracking-wider block mb-6 border-b-4 border-black pb-2 text-center">
+                Your Masterpiece
               </label>
-
-              <div className="w-full flex flex-col items-center">
-                {croppedImage ? (
-                  <>
-                    <CanvasRenderer
-                      format={format}
-                      imageSrc={croppedImage}
-                      name={name}
-                      stack={stack}
-                      github={github}
-                      twitter={twitter}
-                      teamName={teamName}
-                      teamMembers={teamMembers}
-                      title={title}
-                      onRenderComplete={setFinalImage}
-                    />
-                    <ShareButtons finalImageDataUrl={finalImage} />
-                  </>
-                ) : (
-                  <div className="w-full max-w-sm aspect-[4/5] bg-brand-bg brutalist-border flex flex-col items-center justify-center text-black p-8 text-center" style={{ boxShadow: 'inset 4px 4px 0px 0px rgba(0,0,0,0.1)' }}>
-                    <ImageIcon className="w-16 h-16 mb-4 opacity-50" />
-                    <p className="font-bold text-xl uppercase">AWAITING UPLOAD...</p>
-                  </div>
-                )}
+              <img src={finalImage} alt="Final" className="w-full h-auto brutalist-border brutalist-shadow" />
+              
+              <div className="mt-8 flex flex-col md:flex-row gap-4">
+                <a
+                  href={finalImage}
+                  download={format === "A" ? "hhgoa-pfp.png" : "hhgoa-builder-id.png"}
+                  className="flex-1 flex items-center justify-center space-x-2 bg-brand-neon text-black px-6 py-4 brutalist-border font-bold hover:bg-brand-primary hover:text-white transition-colors brutalist-shadow active:translate-y-1 active:translate-x-1"
+                  style={{ boxShadow: '4px 4px 0px 0px #000' }}
+                >
+                  <Download className="w-5 h-5" />
+                  <span>DOWNLOAD</span>
+                </a>
+                <button
+                  onClick={() => {
+                    const tweetText = encodeURIComponent("I'm heading to HH Goa 2026! 🌴 Check out my Builder ID. Join us at https://hh-goa.example.com #HHGoa #Builders");
+                    window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, "_blank");
+                  }}
+                  className="flex-1 flex items-center justify-center space-x-2 bg-black text-white px-6 py-4 brutalist-border font-bold hover:bg-brand-pink transition-colors brutalist-shadow active:translate-y-1 active:translate-x-1"
+                  style={{ boxShadow: '4px 4px 0px 0px #000' }}
+                >
+                  <Share2 className="w-5 h-5" />
+                  <span>SHARE ON X</span>
+                </button>
               </div>
+              <button
+                onClick={handleReset}
+                className="w-full mt-4 flex items-center justify-center space-x-2 bg-brand-bg text-black px-6 py-4 brutalist-border font-bold hover:bg-black hover:text-brand-neon transition-colors brutalist-shadow active:translate-y-1 active:translate-x-1"
+                style={{ boxShadow: '4px 4px 0px 0px #000' }}
+              >
+                <RefreshCcw className="w-5 h-5" />
+                <span>CREATE ANOTHER</span>
+              </button>
             </div>
           </div>
-
-        </div>
+        )}
       </main>
     </>
   );
