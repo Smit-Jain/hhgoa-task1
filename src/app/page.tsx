@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import ImageUploader from "@/components/ImageUploader";
 import CanvasRenderer, { FormatType } from "@/components/CanvasRenderer";
+import BuilderForm from "@/components/BuilderForm";
 import ShareButtons from "@/components/ShareButtons";
 import { Zap, Image as ImageIcon, CreditCard } from "lucide-react";
 import logoImg from "../../public/247pm-studio.png";
@@ -60,6 +61,8 @@ export default function Home() {
   // Format B State
   const [name, setName] = useState("");
   const [stack, setStack] = useState("");
+  const [github, setGithub] = useState("");
+  const [twitter, setTwitter] = useState("");
   const [title, setTitle] = useState("");
 
   useEffect(() => {
@@ -188,38 +191,17 @@ export default function Home() {
           {/* Left Column: Inputs */}
           <div className="lg:col-span-5 space-y-8 w-full max-w-md mx-auto lg:mx-0">
 
-            {/* Form Inputs (Only for Format B) */}
-            {format === "B" && (
-              <div className="bg-brand-neon p-6 brutalist-border brutalist-shadow animate-in fade-in slide-in-from-top-4 duration-300">
-                <label className="text-lg font-black text-black uppercase tracking-wider block mb-4 border-b-4 border-black pb-2">
-                  2. Your Details
-                </label>
-
-                <div className="space-y-4">
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="NAME (E.G. JOHN DOE)"
-                      maxLength={20}
-                      value={name}
-                      onChange={(e) => setName(e.target.value.toUpperCase())}
-                      className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="ROLE (E.G. FULL STACK HACKER)"
-                      maxLength={30}
-                      value={stack}
-                      onChange={(e) => setStack(e.target.value.toUpperCase())}
-                      className="w-full bg-brand-bg brutalist-border px-4 py-3 text-black placeholder-gray-500 font-bold focus:outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+            <BuilderForm
+              format={format}
+              name={name}
+              setName={setName}
+              stack={stack}
+              setStack={setStack}
+              github={github}
+              setGithub={setGithub}
+              twitter={twitter}
+              setTwitter={setTwitter}
+            />
 
             {/* Upload Section */}
             <div className="bg-brand-pink p-6 brutalist-border brutalist-shadow text-white">
@@ -267,6 +249,8 @@ export default function Home() {
                       imageSrc={croppedImage}
                       name={name}
                       stack={stack}
+                      github={github}
+                      twitter={twitter}
                       title={title}
                       onRenderComplete={setFinalImage}
                     />
