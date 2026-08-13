@@ -5,8 +5,10 @@ import Image from "next/image";
 import ImageUploader from "@/components/ImageUploader";
 import CanvasRenderer, { FormatType } from "@/components/CanvasRenderer";
 import BuilderForm from "@/components/BuilderForm";
+import TeamForm from "@/components/TeamForm";
+import { TeamMember } from "@/components/CanvasRenderer";
 import ShareButtons from "@/components/ShareButtons";
-import { Zap, Image as ImageIcon, CreditCard } from "lucide-react";
+import { Zap, Image as ImageIcon, CreditCard, Users } from "lucide-react";
 import logoImg from "../../public/247pm-studio.png";
 import sunLogoImg from "../../public/sun-logo.png";
 
@@ -64,6 +66,10 @@ export default function Home() {
   const [github, setGithub] = useState("");
   const [twitter, setTwitter] = useState("");
   const [title, setTitle] = useState("");
+
+  // Format C (Team ID) State
+  const [teamName, setTeamName] = useState("");
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   useEffect(() => {
     setTitle(BUILDER_TITLES[Math.floor(Math.random() * BUILDER_TITLES.length)]);
@@ -158,7 +164,7 @@ export default function Home() {
             <label className="text-lg font-black text-black uppercase tracking-wider block mb-4 border-b-4 border-black pb-2">
               1. Choose Format
             </label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 onClick={() => setFormat("A")}
                 className={`p-4 brutalist-border flex flex-col items-center text-center transition-transform active:translate-y-1 active:translate-x-1 ${format === "A"
@@ -182,6 +188,17 @@ export default function Home() {
                 <CreditCard className="w-8 h-8 mb-2" />
                 <span className="font-bold">Builder ID</span>
               </button>
+              <button
+                onClick={() => setFormat("C")}
+                className={`p-4 brutalist-border flex flex-col items-center text-center transition-transform active:translate-y-1 active:translate-x-1 ${format === "C"
+                  ? "bg-brand-primary text-white brutalist-shadow-neon"
+                  : "bg-brand-bg text-black hover:bg-brand-neon"
+                  }`}
+                style={{ boxShadow: format === "C" ? '6px 6px 0px 0px #fee101' : '4px 4px 0px 0px #000' }}
+              >
+                <Users className="w-8 h-8 mb-2" />
+                <span className="font-bold">Team ID</span>
+              </button>
             </div>
           </div>
         </div>
@@ -203,11 +220,19 @@ export default function Home() {
               setTwitter={setTwitter}
             />
 
+            <TeamForm
+              format={format}
+              teamName={teamName}
+              setTeamName={setTeamName}
+              teamMembers={teamMembers}
+              setTeamMembers={setTeamMembers}
+            />
+
             {/* Upload Section */}
             <div className="bg-brand-pink p-6 brutalist-border brutalist-shadow text-white">
               <div className="flex items-center justify-between mb-4 border-b-4 border-black pb-2">
                 <label className="text-lg font-black uppercase tracking-wider block text-black">
-                  {format === "B" ? "3. Upload Photo" : "2. Upload Photo"}
+                  {format === "B" ? "3. Upload Photo" : format === "C" ? "3. Upload Team Photo" : "2. Upload Photo"}
                 </label>
                 {croppedImage && (
                   <button
@@ -251,6 +276,8 @@ export default function Home() {
                       stack={stack}
                       github={github}
                       twitter={twitter}
+                      teamName={teamName}
+                      teamMembers={teamMembers}
                       title={title}
                       onRenderComplete={setFinalImage}
                     />
